@@ -1,8 +1,10 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useUserStore } from '../stores/userStore'
 
 const router = useRouter()
+const userStore = useUserStore()
 
 const form = ref({
   major: '',
@@ -13,7 +15,7 @@ const form = ref({
 const isSubmitted = ref(false)
 const isLoading = ref(false)
 
-const handleSubmit = () => {
+const handleSubmit = async () => {
   if (!form.value.major || !form.value.semester || !form.value.learningStyle) {
     alert("Mohon lengkapi semua pertanyaan kuisioner.")
     return
@@ -21,9 +23,13 @@ const handleSubmit = () => {
 
   isLoading.value = true
 
-  // Simulasi proses submit di sisi frontend (tanpa backend database)
-  setTimeout(() => {
-    isLoading.value = false
+  try {
+    await userStore.submitOnboarding({
+      major: form.value.major,
+      semester: form.value.semester,
+      learning_style: form.value.learningStyle // Map to backend snake_case expected format
+    })
+
     isSubmitted.value = true
 
     // Redirect otomatis setelah berhasil
@@ -31,7 +37,12 @@ const handleSubmit = () => {
       router.push('/')
     }, 2000)
     
-  }, 1000) // pura-pura loading 1 detik
+  } catch (error) {
+    alert("Gagal menyimpan profil. Silakan coba lagi.");
+    console.error(error);
+  } finally {
+    isLoading.value = false
+  }
 }
 </script>
 

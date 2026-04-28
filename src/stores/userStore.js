@@ -5,6 +5,7 @@ export const useUserStore = defineStore('user', {
     state: () => ({
         user: null,
         token: localStorage.getItem('auth_token') || null,
+        isProfileLoaded: false,
     }),
     actions: {
         async login(email, password) {
@@ -19,9 +20,37 @@ export const useUserStore = defineStore('user', {
                 throw error;
             }
         },
+        async fetchProfile() {
+            if (!this.token) return null;
+            try {
+                const response = await api.get('/user');
+                this.user = response.data.data;
+                this.isProfileLoaded = true;
+                return this.user;
+            } catch (error) {
+                console.error("Failed to fetch profile", error);
+                this.logout();
+                throw error;
+            }
+        },
+        async submitOnboarding(data) {
+            try {
+                const response = await api.post('/onboarding', data);
+                // Update user data locally with the new onboarding info
+                if (this.user) {
+                    this.user.is_onboarded = true;
+                    Object.assign(this.user, data);
+                }
+                return response.data;
+            } catch (error) {
+                console.error("Onboarding failed", error);
+                throw error;
+            }
+        },
         logout() {
             this.user = null;
             this.token = null;
+            this.isProfileLoaded = false;
             localStorage.removeItem('auth_token');
         }
     }
