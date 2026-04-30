@@ -1,5 +1,13 @@
 import { defineStore } from 'pinia'
 import api from '../services/api'
+import {
+    DUMMY_TOKEN,
+    clearDummyData,
+    getDummyUser,
+    isDummyLogin,
+    isDummyToken,
+    saveDummyUser,
+} from '../services/dummyData'
 
 export const useUserStore = defineStore('user', {
     state: () => ({
@@ -9,10 +17,22 @@ export const useUserStore = defineStore('user', {
     }),
     actions: {
         async login(email, password) {
+            if (isDummyLogin(email, password)) {
+                const dummyUser = getDummyUser()
+
+                this.token = DUMMY_TOKEN
+                this.user = dummyUser
+                this.isProfileLoaded = true
+                localStorage.setItem('auth_token', this.token)
+                saveDummyUser(dummyUser)
+                return true
+            }
+
             try {
                 const response = await api.post('/login', { email, password });
                 this.token = response.data.data.token;
                 this.user = response.data.data.user;
+                this.isProfileLoaded = true;
                 localStorage.setItem('auth_token', this.token);
                 return true;
             } catch (error) {
@@ -22,6 +42,13 @@ export const useUserStore = defineStore('user', {
         },
         async fetchProfile() {
             if (!this.token) return null;
+
+            if (isDummyToken(this.token)) {
+                this.user = getDummyUser()
+                this.isProfileLoaded = true
+                return this.user
+            }
+
             try {
                 const response = await api.get('/user');
                 this.user = response.data.data;
@@ -34,6 +61,17 @@ export const useUserStore = defineStore('user', {
             }
         },
         async submitOnboarding(data) {
+            if (isDummyToken(this.token)) {
+                this.user = {
+                    ...getDummyUser(),
+                    ...data,
+                    is_onboarded: true,
+                }
+                this.isProfileLoaded = true
+                saveDummyUser(this.user)
+                return { data: this.user }
+            }
+
             try {
                 const response = await api.post('/onboarding', data);
                 // Update user data locally with the new onboarding info
@@ -52,6 +90,7 @@ export const useUserStore = defineStore('user', {
             this.token = null;
             this.isProfileLoaded = false;
             localStorage.removeItem('auth_token');
+            clearDummyData();
         }
     }
 })

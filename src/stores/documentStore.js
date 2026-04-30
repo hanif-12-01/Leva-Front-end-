@@ -1,5 +1,11 @@
 import { defineStore } from 'pinia';
 import api from '../services/api';
+import {
+    createDummyTasksFromFile,
+    getDummyTasks,
+    isDummyToken,
+    saveDummyTasks,
+} from '../services/dummyData';
 
 export const useDocumentStore = defineStore('document', {
     state: () => ({
@@ -9,6 +15,18 @@ export const useDocumentStore = defineStore('document', {
     actions: {
         async uploadPdf(file) {
             this.isUploading = true;
+
+            if (isDummyToken(localStorage.getItem('auth_token'))) {
+                await new Promise(resolve => setTimeout(resolve, 800));
+
+                const newTasks = createDummyTasksFromFile(file.name);
+                this.addTasks(newTasks);
+                return {
+                    message: 'Dummy upload berhasil. Task contoh sudah dibuat.',
+                    data: newTasks,
+                };
+            }
+
             const formData = new FormData();
             formData.append('document', file);
 
@@ -26,9 +44,17 @@ export const useDocumentStore = defineStore('document', {
         },
         addTasks(newTasks) {
             this.tasks = [...this.tasks, ...newTasks];
+            if (isDummyToken(localStorage.getItem('auth_token'))) {
+                saveDummyTasks(this.tasks);
+            }
             this.isUploading = false; // Reset uploading state since tasks are received
         },
         async fetchTasks() {
+            if (isDummyToken(localStorage.getItem('auth_token'))) {
+                this.tasks = getDummyTasks();
+                return this.tasks;
+            }
+
             try {
                 const response = await api.get('/tasks');
                 this.tasks = response.data.data;
