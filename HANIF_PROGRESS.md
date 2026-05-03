@@ -59,6 +59,22 @@ Sesuai rancangan *Base Idea Rutinitas Harian*:
 
 ---
 
-## 📋 Langkah Selanjutnya
-Untuk iterasi berikutnya, dukungan terhadap anggota tim lain akan difokuskan pada:
-1. ...
+## 📋 Langkah Selanjutnya (To-Do List Progres Berikutnya)
+Berdasarkan analisis *Dokumen SRS Leva* dan rencana fungsional *Base Idea*, target pengerjaan Frontend selanjutnya untuk **Hanif** difokuskan pada perancangan antarmuka fungsionalitas inti AI:
+
+### 1. Antarmuka Asisten Obrolan RAG (Sadar Konteks)
+- **Tugas:** Membuat komponen UI obrolan (*Chat Interface*) (`ChatAssistant.vue`).
+- **Target:** Mampu menangani kueri linguistik asinkron dari pengguna, menampilkan proses *typing/loading*, dan merender balasan saran alat AI yang dipersonalisasi dari backend (hasil dari Qdrant & OpenAI/Gemini).
+
+### 2. Komponen *To-Do List* Pemecahan PDF Interaktif
+- **Tugas:** Mengembangkan UI interaktif untuk *Mesin Pemecah Kelumpuhan Kognitif*.
+- **Target:** Ketika WebSockets (`PdfProcessed`) menerima struktur respons objek JSON dari backend (berisi `judul_tugas`, `estimasi_waktu`, dan `kategori_alat_ai_yang_rekomendasi`), UI harus bisa merender data tersebut menjadi *checklist* tugas mikro (*Atomic Habits*). Setiap daftar tugas harus memiliki tautan/tombol instan ke antarmuka AI yang disarankan.
+
+### 3. UI Fitur *Smart Bookmarking* (Manajemen Referensi)
+- **Tugas:** Membuat antarmuka untuk menyimpan dan menampilkan riwayat direktori alat AI favorit pengguna.
+- **Target:** Mengakomodasi tampilan desain *card* alat yang bisa memunculkan maksimum "5 tag semantik mutlak" buatan AI (*LLM tag generation*) agar mempermudah pencarian ruang spasial pengguna di masa mendatang.
+
+### 4. Peningkatan UX Manajemen Antrean PDF
+- **Tugas:** Mengoptimalkan UX visualisasi pengunggahan dokumen silabus akademik.
+- **Target:** Mengingat backend akan melempar beban ekstraksi teks PDF ke *Laravel Jobs/Queue* (asinkron), frontend perlu mempertahankan antarmuka animasi memuat (*indeterminate loading*) yang intuitif tanpa memblokir seluruh akses navigasi, hingga WebSocket memancarkan status selesai.
+
