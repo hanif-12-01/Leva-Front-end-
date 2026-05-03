@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '../stores/userStore'
+import { isValidPhoneNumber } from '../utils/validation'
 
 const router = useRouter()
 const userStore = useUserStore()
@@ -9,15 +10,24 @@ const userStore = useUserStore()
 const form = ref({
   major: '',
   semester: '',
-  learningStyle: ''
+  learningStyle: '',
+  phone: ''
 })
 
 const isSubmitted = ref(false)
 const isLoading = ref(false)
+const errorMessage = ref('')
 
 const handleSubmit = async () => {
-  if (!form.value.major || !form.value.semester || !form.value.learningStyle) {
-    alert("Mohon lengkapi semua pertanyaan kuisioner.")
+  errorMessage.value = ''
+
+  if (!form.value.major || !form.value.semester || !form.value.learningStyle || !form.value.phone) {
+    errorMessage.value = "Mohon lengkapi semua pertanyaan kuisioner."
+    return
+  }
+
+  if (!isValidPhoneNumber(form.value.phone)) {
+    errorMessage.value = "Nomor HP tidak valid. Gunakan awalan '08' atau '62'."
     return
   }
 
@@ -38,8 +48,12 @@ const handleSubmit = async () => {
     }, 2000)
     
   } catch (error) {
-    alert("Gagal menyimpan profil. Silakan coba lagi.");
-    console.error(error);
+    // Menerjemahkan error backend (Tugas Kamis)
+    if (error.response && error.response.status === 400) {
+      errorMessage.value = "Data tidak sesuai kriteria backend. Cek kembali isian Anda.";
+    } else {
+      errorMessage.value = "Gagal menyimpan profil. Silakan coba lagi nanti.";
+    }
   } finally {
     isLoading.value = false
   }
@@ -53,7 +67,16 @@ const handleSubmit = async () => {
         <h2>Profil Akademik</h2>
         <p class="subtitle">Bantu kami menyesuaikan workspace dengan gaya belajarmu.</p>
         
+        <div v-if="errorMessage" class="alert error" style="color: red; margin-bottom: 1rem;">
+          {{ errorMessage }}
+        </div>
+
         <form @submit.prevent="handleSubmit">
+          <div class="form-group text-left">
+            <label>Nomor Handphone (WhatsApp)</label>
+            <input type="tel" v-model="form.phone" placeholder="Cth: 08123456789" required />
+          </div>
+
           <div class="form-group text-left">
             <label>Apa jurusan atau program studimu?</label>
             <input type="text" v-model="form.major" placeholder="Cth: Kedokteran, Teknik Informatika" required />
@@ -72,8 +95,8 @@ const handleSubmit = async () => {
 
           <div class="form-group text-left">
             <label>Bagaimana gaya belajar yang paling cocok untukmu?</label>
-            <select v-model="form.learningStyle" class="styled-select" required>
-              <option disabled value="">Pilih Gaya Belajar</option>
+            <select v-model="form.learningStyle" class="styled-select" re :style="isLoading ? 'cursor: not-allowed; opacity: 0.7;' : ''">
+            {{ isLoading ? '⏳ ed value="">Pilih Gaya Belajar</option>
               <option value="visual">Visual (Suka melihat gambar/diagram)</option>
               <option value="auditory">Auditori (Suka mendengar penjelasan/podcast)</option>
               <option value="reading">Membaca/Menulis (Suka teks dan catatan ringkas)</option>

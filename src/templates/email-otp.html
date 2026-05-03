@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kode OTP Leva Workspace</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            margin: 0;
+            padding: 0;
+            color: #333333;
+        }
+        .email-container {
+            max-width: 600px;
+            margin: 40px auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            border-top: 5px solid #2c3e50; /* Tema Academic Dark Blue */
+        }
+        .header {
+            background-color: #ffffff;
+            padding: 30px 40px 20px;
+            text-align: center;
+            border-bottom: 1px solid #eeeeee;
+        }
+        .header h1 {
+            margin: 0;
+            color: #2c3e50;
+            font-size: 24px;
+            letter-spacing: 1px;
+        }
+        .header p {
+            margin: 5px 0 0;
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+        .content {
+            padding: 40px;
+            text-align: center;
+        }
+        .content h2 {
+            font-size: 20px;
+            color: #2c3e50;
+            margin-top: 0;
+        }
+        .content p {
+            line-height: 1.6;
+            color: #555555;
+            font-size: 15px;
+        }
+        .otp-box {
+            background-color: #f8f9fa;
+            border: 2px dashed #bdc3c7;
+            border-radius: 6px;
+            padding: 20px;
+            margin: 30px auto;
+            max-width: 250px;
+        }
+        .otp-code {
+            font-size: 32px;
+            font-weight: bold;
+            letter-spacing: 5px;
+            color: #2980b9;
+            margin: 0;
+        }
+        .warning-text {
+            font-size: 13px;
+            color: #e74c3c;
+            margin-top: 20px;
+        }
+        .footer {
+            background-color: #f8f9fa;
+            padding: 20px 40px;
+            text-align: center;
+            font-size: 12px;
+            color: #95a5a6;
+            border-top: 1px solid #eeeeee;
+        }
+        .footer a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <!-- Header Section -->
+        <div class="header">
+            <h1>Leva</h1>
+            <p>Your Academic Workspace</p>
+        </div>
+
+        <!-- Main Content -->
+        <div class="content">
+            <h2>Verifikasi Keamanan Akun</h2>
+            <p>Halo,</p>
+            <p>Kami menerima permintaan untuk masuk atau melakukan perubahan pada akun Leva Anda. Untuk memverifikasi identitas Anda dan menjaga keamanan ruang kerja akademik Anda, silakan gunakan kode OTP (One-Time Password) di bawah ini:</p>
+            
+            <div class="otp-box">
+                <p class="otp-code">{{ otp_code }}</p>
+            </div>
+            
+            <p>Kode ini hanya berlaku selama <strong>5 menit</strong>. Jangan pernah membagikan kode ini kepada siapa pun, termasuk staf Leva.</p>
+            
+            <p class="warning-text">Jika Anda tidak merasa melakukan permintaan ini, abaikan email ini atau segera ubah kata sandi Anda untuk menjaga keamanan data.</p>
+        </div>
+
+        <!-- Footer Section -->
+        <div class="footer">
+            <p>&copy; 2026 Leva Academic Workspace. Hak Cipta Dilindungi Undang-Undang.</p>
+            <p>Email ini dikirim secara otomatis. Mohon tidak membalas email ini.</p>
+            <p>Butuh bantuan? Kunjungi <a href="#">Pusat Bantuan Leva</a></p>
+        </div>
+    </div>
+</body>
+</html>

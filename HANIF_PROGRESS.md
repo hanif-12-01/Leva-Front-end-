@@ -44,8 +44,21 @@ Penyimpanan *state* dipecah menjadi dua pilar utama:
 
 ---
 
-## 📋 Langkah Selanjutnya (Sesuai Jadwal "Rabu - Jumat")
-Untuk iterasi berikutnya, pengerjaan akan dilanjutkan dengan fokus pada:
-1. Penambahan **Validasi HTML5 & Regex** pada formulir input.
-2. Menerjemahkan **pesan error backend** (dari Axios *catch*) menjadi bahasa yang *user-friendly*.
-3. Implementasi visual **Loading State / Spinner** untuk tombol submit agar pengguna tidak dapat menekan tombol berulang kali saat memuat data.
+## � Progres Tambahan (Rabu - Sabtu)
+Sesuai rancangan *Base Idea Rutinitas Harian*:
+
+### 1. Validasi UX Frontend & Error Handling (Rabu - Jumat)
+- **Validasi HTML5 & Regex:** Menerapkan validasi form kuat, termasuk pembuatan re-usable function `isValidEmail` dan `isValidPhoneNumber` (Regex HP Indonesia) di file utilitas `src/utils/validation.js`.
+- **Terjemahan Error Backend:** Menangkap status HTTP `400`, `401`, dan `500` dari respon Axios dan mengubah bahasanya menjadi *user-friendly* langsung di dalam antarmuka obrolan `LoginView.vue` dan `OnboardingView.vue`.
+- **Status Memuat (Loading State):** Seluruh tombol aksi disuntikkan logika `:disabled="isLoading"` lengkap dengan UI perubahan gaya kursor dan penambahan *emoji spinner* untuk mencegah pengiriman bertubi-tubi/spamming oleh *user*.
+
+### 2. Desain Template OTP Email (Opsional Sabtu)
+- **File:** `src/templates/email-otp.html`
+- Telah menyiapkan rancangan kode raw HTML statis dengan implementasi *inline CSS* (untuk dukungan *cross-email client*) guna memfasilitasi tugas pengiriman kode keamanan OTP Arkaan via SMTP backend.
+- Diselaraskan dengan *guideline* sistem Leva yang menekankan nuansa ruang akademik (*academic workspace*) profesional, minimalis, dan minim distraksi teknis.
+
+---
+
+## 📋 Langkah Selanjutnya
+Untuk iterasi berikutnya, dukungan terhadap anggota tim lain akan difokuskan pada:
+1. ...

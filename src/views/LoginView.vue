@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '../stores/userStore'
+import { isValidEmail } from '../utils/validation'
 
 const router = useRouter()
 const userStore = useUserStore()
@@ -13,20 +14,40 @@ const errorMessage = ref('')
 const successMessage = ref('')
 
 const handleLogin = async () => {
+  errorMessage.value = ''
+  successMessage.value = ''
+
   if (!email.value || !password.value) {
     errorMessage.value = "Email dan password wajib diisi."
     return
   }
 
-  isLoading.value = true
-  errorMessage.value = ''
-  successMessage.value = ''
+  if (!isValidEmail(email.value)) {
+    errorMessage.value = "Format email tidak valid (contoh: budi@student.com)."
+    return
+  }
 
-  try {
-    // Memanggil fungsi login dari Pinia store
-    await userStore.login(email.value, password.value)
-    successMessage.value = 'Login berhasil! Mengalihkan...'
-    
+  if (password.value.length < 8) {
+    errorMessage.value = "Password harus minimal 8 karakter."
+    return
+  }
+
+  isLoading.value = true
+
+  try {Menerjemahkan error backend jadi User-Friendly (Tugas Kamis - Hanif)
+    if (error.response) {
+       const status = error.response.status;
+       if (status === 400) {
+         errorMessage.value = "Data tidak valid. Periksa kembali form anda.";
+       } else if (status === 401) {
+         errorMessage.value = "Email atau password yang anda masukkan salah.";
+       } else if (status === 500) {
+         errorMessage.value = "Sedang terjadi gangguan pada server. Coba lagi nanti.";
+       } else {
+         errorMessage.value = error.response.data.message || 'Terjadi kesalahan sistem.';
+       }
+    } else {
+       errorMessage.value = 'Gagal terhubung ke server. Periksa koneksi internet Anda
     // Alihkan user ke Dashboard (atau onboarding sesuai flow base idea)
     setTimeout(() => {
       router.push('/')
@@ -62,10 +83,10 @@ const handleLogin = async () => {
         </div>
         <div class="form-group">
           <label>Password</label>
-          <input type="password" v-model="password" placeholder="••••••••" required />
+          <input type="password" v-model="password" placeholder="••••••••" required minlength="8" />
         </div>
-        <button type="submit" class="btn-primary" :disabled="isLoading">
-          {{ isLoading ? 'Memproses...' : 'Sign In' }}
+        <button type="submit" class="btn-primary" :disabled="isLoading" :style="isLoading ? 'cursor: not-allowed; opacity: 0.7;' : ''">
+          {{ isLoading ? '⏳ Memproses...' : 'Sign In' }}
         </button>
       </form>
     </div>
