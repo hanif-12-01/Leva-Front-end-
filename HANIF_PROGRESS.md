@@ -57,6 +57,15 @@ Sesuai rancangan *Base Idea Rutinitas Harian*:
 - Telah menyiapkan rancangan kode raw HTML statis dengan implementasi *inline CSS* (untuk dukungan *cross-email client*) guna memfasilitasi tugas pengiriman kode keamanan OTP Arkaan via SMTP backend.
 - Diselaraskan dengan *guideline* sistem Leva yang menekankan nuansa ruang akademik (*academic workspace*) profesional, minimalis, dan minim distraksi teknis.
 
+### 3. Debugging & Integrasi API End-to-End (Update Terbaru)
+- **Perbaikan Rute Profil (`userStore.js`):** Mengubah *endpoint* penarikan profil yang sebelumnya mengalami error 404 dari `/api/user` menjadi `/api/me` sehingga profil pengguna berhasil disinkronkan setelah Login.
+- **Refactoring Vue Router:** Memperbaiki peringatan *Deprecated Navigation Guards* pada `src/router/index.js` dengan mengganti penggunaan `next()` lawas menjadi pengembalian *object* terstruktur (contoh: `return { name: 'login' }`) untuk menghindari potensi *routing loop*.
+- **Perbaikan Payload Form Onboarding (`OnboardingView.vue`):** 
+  - Menyelesaikan HTTP Error 422 (*Unprocessable Content*) dengan menyelaraskan tipe input formulir.
+  - Memastikan *drop-down* nilai **semester** murni melempar tipe data `Integer` (menggunakan `parseInt`).
+  - Menambahkan baris tak terlihat `language_preference: 'Indonesian'` di belakang layar (*background mapping*) agar sesuai dengan tuntutan validasi ketat dan spesifikasi *Laravel OnboardingService* buatan backend.
+  - Tangkapan pesan error (422/400) yang jauh lebih akurat dan ramah-pengguna ke antarmuka aplikasi.
+
 ---
 
 ## 📋 Langkah Selanjutnya (To-Do List Progres Berikutnya)
@@ -77,4 +86,3 @@ Berdasarkan analisis *Dokumen SRS Leva* dan rencana fungsional *Base Idea*, targ
 ### 4. Peningkatan UX Manajemen Antrean PDF
 - **Tugas:** Mengoptimalkan UX visualisasi pengunggahan dokumen silabus akademik.
 - **Target:** Mengingat backend akan melempar beban ekstraksi teks PDF ke *Laravel Jobs/Queue* (asinkron), frontend perlu mempertahankan antarmuka animasi memuat (*indeterminate loading*) yang intuitif tanpa memblokir seluruh akses navigasi, hingga WebSocket memancarkan status selesai.
-

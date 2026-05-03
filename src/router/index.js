@@ -25,7 +25,7 @@ const router = createRouter({
     ]
 })
 
-router.beforeEach(async (to, from, next) => {
+router.beforeEach(async (to, from) => {
     const userStore = useUserStore()
     
     // Check if token exists but profile isn't loaded yet
@@ -41,17 +41,15 @@ router.beforeEach(async (to, from, next) => {
     const user = userStore.user;
 
     if (to.meta.requiresAuth && !isAuthenticated) {
-        next({ name: 'login' });
+        return { name: 'login' };
     } else if (to.meta.requiresGuest && isAuthenticated) {
-        next({ name: 'dashboard' });
+        return { name: 'dashboard' };
     } else if (isAuthenticated && user && !user.is_onboarded && to.name !== 'onboarding') {
         // If authenticated but not onboarded, force them to onboarding
-        next({ name: 'onboarding' });
+        return { name: 'onboarding' };
     } else if (isAuthenticated && user && user.is_onboarded && to.name === 'onboarding') {
         // If already onboarded, don't let them access onboarding again
-        next({ name: 'dashboard' });
-    } else {
-        next();
+        return { name: 'dashboard' };
     }
 })
 

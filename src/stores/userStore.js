@@ -50,7 +50,7 @@ export const useUserStore = defineStore('user', {
             }
 
             try {
-                const response = await api.get('/user');
+                const response = await api.get('/me');
                 this.user = response.data.data;
                 this.isProfileLoaded = true;
                 return this.user;

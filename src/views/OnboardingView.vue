@@ -10,6 +10,7 @@ const userStore = useUserStore()
 const form = ref({
   major: '',
   semester: '',
+  language_preference: 'Indonesian',
   learningStyle: '',
   phone: ''
 })
@@ -36,7 +37,8 @@ const handleSubmit = async () => {
   try {
     await userStore.submitOnboarding({
       major: form.value.major,
-      semester: form.value.semester,
+      semester: parseInt(form.value.semester, 10),
+      language_preference: form.value.language_preference,
       learning_style: form.value.learningStyle // Map to backend snake_case expected format
     })
 
@@ -47,10 +49,12 @@ const handleSubmit = async () => {
       router.push('/')
     }, 2000)
     
-  } catch (error) {
+    } catch (error) {
     // Menerjemahkan error backend (Tugas Kamis)
-    if (error.response && error.response.status === 400) {
-      errorMessage.value = "Data tidak sesuai kriteria backend. Cek kembali isian Anda.";
+    if (error.response && error.response.status === 422) {
+      errorMessage.value = "Data tidak sesuai kriteria backend. Cek kembali isian Anda. Pastikan semua field sudah lengkap.";
+    } else if (error.response && error.response.status === 400) {
+      errorMessage.value = "Terjadi kesalahan pada format permintaan.";
     } else {
       errorMessage.value = "Gagal menyimpan profil. Silakan coba lagi nanti.";
     }
@@ -86,17 +90,21 @@ const handleSubmit = async () => {
             <label>Saat ini kamu berada di semester berapa?</label>
             <select v-model="form.semester" class="styled-select" required>
               <option disabled value="">Pilih Semester</option>
-              <option value="1-2">Tahun Pertama (Semester 1 - 2)</option>
-              <option value="3-4">Tahun Kedua (Semester 3 - 4)</option>
-              <option value="5-6">Tahun Ketiga (Semester 5 - 6)</option>
-              <option value="7+">Tahun Akhir (Semester 7+)</option>
+              <option value="1">Semester 1</option>
+              <option value="2">Semester 2</option>
+              <option value="3">Semester 3</option>
+              <option value="4">Semester 4</option>
+              <option value="5">Semester 5</option>
+              <option value="6">Semester 6</option>
+              <option value="7">Semester 7</option>
+              <option value="8">Semester 8+</option>
             </select>
           </div>
 
           <div class="form-group text-left">
             <label>Bagaimana gaya belajar yang paling cocok untukmu?</label>
-            <select v-model="form.learningStyle" class="styled-select" re :style="isLoading ? 'cursor: not-allowed; opacity: 0.7;' : ''">
-            {{ isLoading ? '⏳ ed value="">Pilih Gaya Belajar</option>
+            <select v-model="form.learningStyle" class="styled-select" required>
+              <option disabled value="">Pilih Gaya Belajar</option>
               <option value="visual">Visual (Suka melihat gambar/diagram)</option>
               <option value="auditory">Auditori (Suka mendengar penjelasan/podcast)</option>
               <option value="reading">Membaca/Menulis (Suka teks dan catatan ringkas)</option>
@@ -104,8 +112,8 @@ const handleSubmit = async () => {
             </select>
           </div>
           
-          <button type="submit" class="btn-primary" :disabled="isLoading">
-            {{ isLoading ? 'Menyimpan Jawaban...' : 'Simpan Profil & Lanjut' }}
+          <button type="submit" class="btn-primary" :disabled="isLoading" :style="isLoading ? 'cursor: not-allowed; opacity: 0.7;' : ''">
+            {{ isLoading ? '⏳ Menyimpan Jawaban...' : 'Simpan Profil & Lanjut' }}
           </button>
         </form>
       </div>

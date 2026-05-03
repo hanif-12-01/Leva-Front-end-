@@ -34,7 +34,18 @@ const handleLogin = async () => {
 
   isLoading.value = true
 
-  try {Menerjemahkan error backend jadi User-Friendly (Tugas Kamis - Hanif)
+  try {
+    // Memanggil fungsi login dari Pinia store
+    await userStore.login(email.value, password.value)
+    successMessage.value = 'Login berhasil! Mengalihkan...'
+    
+    // Alihkan user ke Dashboard (atau onboarding sesuai flow base idea)
+    setTimeout(() => {
+      router.push('/')
+    }, 1500)
+    
+  } catch (error) {
+    // Menerjemahkan error backend jadi User-Friendly (Tugas Kamis - Hanif)
     if (error.response) {
        const status = error.response.status;
        if (status === 400) {
@@ -47,18 +58,7 @@ const handleLogin = async () => {
          errorMessage.value = error.response.data.message || 'Terjadi kesalahan sistem.';
        }
     } else {
-       errorMessage.value = 'Gagal terhubung ke server. Periksa koneksi internet Anda
-    // Alihkan user ke Dashboard (atau onboarding sesuai flow base idea)
-    setTimeout(() => {
-      router.push('/')
-    }, 1500)
-    
-  } catch (error) {
-    // Jika backend mati atau kredensial salah
-    if (error.response) {
-       errorMessage.value = error.response.data.message || 'Email atau password salah.'
-    } else {
-       errorMessage.value = 'Gagal terhubung ke backend. Pastikan server leva-api berjalan di http://localhost:8000.'
+       errorMessage.value = 'Gagal terhubung ke server. Periksa koneksi internet Anda.'
     }
   } finally {
     isLoading.value = false
