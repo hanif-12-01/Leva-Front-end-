@@ -44,7 +44,7 @@ Penyimpanan *state* dipecah menjadi dua pilar utama:
 
 ---
 
-## � Progres Tambahan (Rabu - Sabtu)
+## Progres Tambahan (Rabu - Sabtu)
 Sesuai rancangan *Base Idea Rutinitas Harian*:
 
 ### 1. Validasi UX Frontend & Error Handling (Rabu - Jumat)
