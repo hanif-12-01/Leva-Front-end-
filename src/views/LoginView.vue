@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '../stores/userStore'
 import { isValidEmail } from '../utils/validation'
@@ -13,14 +13,20 @@ const isLoading = ref(false)
 const errorMessage = ref('')
 const successMessage = ref('')
 
+watch([email, password], () => {
+  errorMessage.value = ''
+})
+
 const handleLogin = async () => {
+  if (isLoading.value) return
+
   errorMessage.value = ''
   successMessage.value = ''
 
-  if (!email.value || !password.value) {
-    errorMessage.value = "Email dan password wajib diisi."
-    return
-  }
+  if (!email.value.trim() || !password.value.trim()) {
+  errorMessage.value = "Email dan password wajib diisi."
+  return
+}
 
   if (!isValidEmail(email.value)) {
     errorMessage.value = "Format email tidak valid (contoh: budi@student.com)."
@@ -58,7 +64,7 @@ const handleLogin = async () => {
          errorMessage.value = error.response.data.message || 'Terjadi kesalahan sistem.';
        }
     } else {
-       errorMessage.value = 'Gagal terhubung ke server. Periksa koneksi internet Anda.'
+       errorMessage.value = "Gagal terhubung ke server. Periksa koneksi internet Anda."
     }
   } finally {
     isLoading.value = false
@@ -79,11 +85,11 @@ const handleLogin = async () => {
       <form @submit.prevent="handleLogin">
         <div class="form-group">
           <label>Email Address</label>
-          <input type="email" v-model="email" placeholder="student@example.com" required />
+          <input type="email" v-model="email" placeholder="student@example.com" required :disabled="isLoading" />
         </div>
         <div class="form-group">
           <label>Password</label>
-          <input type="password" v-model="password" placeholder="••••••••" required minlength="8" />
+          <input type="password" v-model="password" placeholder="••••••••" required minlength="8" :disabled="isLoading" />
         </div>
         <button type="submit" class="btn-primary" :disabled="isLoading" :style="isLoading ? 'cursor: not-allowed; opacity: 0.7;' : ''">
           {{ isLoading ? '⏳ Memproses...' : 'Sign In' }}
