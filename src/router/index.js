@@ -21,6 +21,24 @@ const router = createRouter({
             name: 'dashboard',
             component: () => import('../views/DashboardView.vue'),
             meta: { requiresAuth: true }
+        },
+        {
+            path: '/chat',
+            name: 'chat',
+            component: () => import('../views/ChatWorkspaceView.vue'),
+            meta: { requiresAuth: true }
+        },
+        {
+            path: '/library',
+            name: 'library',
+            component: () => import('../views/LibraryView.vue'),
+            meta: { requiresAuth: true }
+        },
+        {
+            path: '/profile',
+            name: 'profile',
+            component: () => import('../views/ProfileView.vue'),
+            meta: { requiresAuth: true }
         }
     ]
 })

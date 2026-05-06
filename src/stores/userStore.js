@@ -9,6 +9,21 @@ import {
     saveDummyUser,
 } from '../services/dummyData'
 
+const normalizeUser = (payload) => {
+    const user = payload?.user || payload
+    if (!user) return null
+
+    const profile = user.profile || {}
+    return {
+        ...user,
+        major: user.major ?? profile.major ?? '',
+        semester: user.semester ?? profile.semester ?? '',
+        language_preference: user.language_preference ?? profile.language_preference ?? 'Indonesian',
+        learning_style: user.learning_style ?? profile.learning_style ?? '',
+        is_onboarded: Boolean(user.is_onboarded ?? user.profile ?? user.status === 'ACTIVE'),
+    }
+}
+
 export const useUserStore = defineStore('user', {
     state: () => ({
         user: null,
@@ -31,7 +46,7 @@ export const useUserStore = defineStore('user', {
             try {
                 const response = await api.post('/login', { email, password });
                 this.token = response.data.data.token;
-                this.user = response.data.data.user;
+                this.user = normalizeUser(response.data.data.user);
                 this.isProfileLoaded = true;
                 localStorage.setItem('auth_token', this.token);
                 return true;
@@ -51,7 +66,7 @@ export const useUserStore = defineStore('user', {
 
             try {
                 const response = await api.get('/me');
-                this.user = response.data.data;
+                this.user = normalizeUser(response.data.data);
                 this.isProfileLoaded = true;
                 return this.user;
             } catch (error) {
@@ -74,11 +89,8 @@ export const useUserStore = defineStore('user', {
 
             try {
                 const response = await api.post('/onboarding', data);
-                // Update user data locally with the new onboarding info
-                if (this.user) {
-                    this.user.is_onboarded = true;
-                    Object.assign(this.user, data);
-                }
+                const updatedUser = normalizeUser(response.data.data);
+                this.user = updatedUser || { ...this.user, ...data, is_onboarded: true };
                 return response.data;
             } catch (error) {
                 console.error("Onboarding failed", error);
