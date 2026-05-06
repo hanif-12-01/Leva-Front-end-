@@ -10,7 +10,7 @@ const route = useRoute()
 const router = useRouter()
 const appStore = useAppStore()
 
-const isShellRoute = computed(() => !['login', 'onboarding'].includes(route.name))
+const isShellRoute = computed(() => !['login', 'register', 'onboarding'].includes(route.name))
 const isTypingTarget = (target) => {
   if (!(target instanceof HTMLElement)) return false
   return target.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName)
