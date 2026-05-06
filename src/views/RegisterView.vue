@@ -3,6 +3,7 @@ import { computed, ref, watch } from 'vue'
 import { RouterLink, useRouter } from 'vue-router'
 import AppIcon from '../components/AppIcon.vue'
 import { useUserStore } from '../stores/userStore'
+import { friendlyAuthError } from '../utils/errorMessages'
 import { isValidEmail } from '../utils/validation'
 
 const router = useRouter()
@@ -57,14 +58,7 @@ const handleRegister = async () => {
     })
     router.push({ name: 'onboarding' })
   } catch (error) {
-    const errors = error.response?.data?.errors
-    if (errors) {
-      errorMessage.value = Object.values(errors).flat()[0] || 'Registrasi gagal. Periksa kembali data kamu.'
-    } else if (error.response?.data?.message) {
-      errorMessage.value = error.response.data.message
-    } else {
-      errorMessage.value = 'Gagal terhubung ke server. Pastikan backend Laravel aktif.'
-    }
+    errorMessage.value = friendlyAuthError(error, 'Registrasi gagal. Periksa kembali data kamu.')
   } finally {
     isLoading.value = false
   }

@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router'
 import AppIcon from '../components/AppIcon.vue'
 import { DUMMY_CREDENTIALS } from '../services/dummyData'
 import { useUserStore } from '../stores/userStore'
+import { friendlyAuthError } from '../utils/errorMessages'
 import { isValidEmail } from '../utils/validation'
 
 const router = useRouter()
@@ -44,13 +45,7 @@ const handleLogin = async () => {
     await userStore.login(email.value, password.value)
     router.push('/')
   } catch (error) {
-    if (error.response?.status === 401) {
-      errorMessage.value = 'Email atau password salah.'
-    } else if (error.response?.data?.message) {
-      errorMessage.value = error.response.data.message
-    } else {
-      errorMessage.value = 'Gagal terhubung ke server. Untuk demo, gunakan kredensial dummy di bawah.'
-    }
+    errorMessage.value = friendlyAuthError(error, 'Login gagal. Periksa kembali email dan password kamu.')
   } finally {
     isLoading.value = false
   }
