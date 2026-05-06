@@ -14,8 +14,14 @@ const firstValidationMessage = (errors = {}) => {
 
 export const friendlyAuthError = (error, fallback = 'Terjadi kendala pada server. Silakan coba lagi nanti.') => {
   const status = error.response?.status
+  const responseData = error.response?.data
   const validation = firstValidationMessage(error.response?.data?.errors)
-  const rawMessage = String(validation?.message || error.response?.data?.message || '').toLowerCase()
+  const rawMessage = [
+    validation?.message,
+    responseData?.message,
+    typeof responseData === 'string' ? responseData : '',
+    responseData ? JSON.stringify(responseData) : '',
+  ].filter(Boolean).join(' ').toLowerCase()
   const field = validation?.field || ''
 
   if (status === 0 || !error.response) {
@@ -30,6 +36,19 @@ export const friendlyAuthError = (error, fallback = 'Terjadi kendala pada server
     return 'Akun ini sudah pernah menyelesaikan proses tersebut.'
   }
 
+  if (
+    rawMessage.includes('email sudah tersedia')
+    || rawMessage.includes('email already')
+    || rawMessage.includes('already been taken')
+    || rawMessage.includes('has already been taken')
+    || rawMessage.includes('duplicate')
+    || rawMessage.includes('users_email_unique')
+    || rawMessage.includes('unique:users')
+    || rawMessage.includes('sqlstate[23000]')
+  ) {
+    return 'Email sudah tersedia.'
+  }
+
   if (field === 'name' || rawMessage.includes('name')) {
     if (rawMessage.includes('required')) return 'Nama lengkap wajib diisi.'
     if (rawMessage.includes('max')) return 'Nama terlalu panjang. Gunakan maksimal 255 karakter.'
@@ -39,7 +58,7 @@ export const friendlyAuthError = (error, fallback = 'Terjadi kendala pada server
   if (field === 'email' || rawMessage.includes('email')) {
     if (rawMessage.includes('required')) return 'Email wajib diisi.'
     if (rawMessage.includes('valid') || rawMessage.includes('format')) return 'Format email belum benar. Contoh: nama@student.com.'
-    if (rawMessage.includes('unique') || rawMessage.includes('already') || rawMessage.includes('taken')) return 'Email ini sudah terdaftar. Silakan masuk atau gunakan email lain.'
+    if (rawMessage.includes('unique') || rawMessage.includes('already') || rawMessage.includes('taken')) return 'Email sudah tersedia.'
     if (status === 404 || rawMessage.includes('not found')) return 'Email tidak ditemukan. Periksa lagi atau daftar akun baru.'
     return 'Email belum sesuai. Periksa kembali alamat email kamu.'
   }
