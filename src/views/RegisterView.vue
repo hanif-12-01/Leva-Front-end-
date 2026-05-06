@@ -1,64 +1,73 @@
 <script setup>
-import { ref, watch } from 'vue'
-import { useRouter } from 'vue-router'
+import { computed, ref, watch } from 'vue'
+import { RouterLink, useRouter } from 'vue-router'
 import AppIcon from '../components/AppIcon.vue'
-import { DUMMY_CREDENTIALS } from '../services/dummyData'
 import { useUserStore } from '../stores/userStore'
 import { isValidEmail } from '../utils/validation'
 
 const router = useRouter()
 const userStore = useUserStore()
 
-const email = ref(DUMMY_CREDENTIALS.email)
-const password = ref(DUMMY_CREDENTIALS.password)
+const name = ref('')
+const email = ref('')
+const password = ref('')
+const passwordConfirmation = ref('')
 const isLoading = ref(false)
 const errorMessage = ref('')
 
-watch([email, password], () => {
+const canSubmit = computed(() => (
+  name.value.trim()
+  && email.value.trim()
+  && password.value
+  && passwordConfirmation.value
+  && !isLoading.value
+))
+
+watch([name, email, password, passwordConfirmation], () => {
   errorMessage.value = ''
 })
 
-const handleLogin = async () => {
+const validationMessage = () => {
+  if (!name.value.trim()) return 'Nama lengkap wajib diisi.'
+  if (name.value.trim().length < 2) return 'Nama minimal 2 karakter.'
+  if (!email.value.trim()) return 'Email wajib diisi.'
+  if (!isValidEmail(email.value)) return 'Format email tidak valid.'
+  if (password.value.length < 8) return 'Password harus minimal 8 karakter.'
+  if (password.value !== passwordConfirmation.value) return 'Konfirmasi password belum sama.'
+  return ''
+}
+
+const handleRegister = async () => {
   if (isLoading.value) return
 
-  errorMessage.value = ''
-
-  if (!email.value.trim() || !password.value.trim()) {
-    errorMessage.value = 'Email dan password wajib diisi.'
-    return
-  }
-
-  if (!isValidEmail(email.value)) {
-    errorMessage.value = 'Format email tidak valid.'
-    return
-  }
-
-  if (password.value.length < 8) {
-    errorMessage.value = 'Password harus minimal 8 karakter.'
+  const message = validationMessage()
+  if (message) {
+    errorMessage.value = message
     return
   }
 
   isLoading.value = true
 
   try {
-    await userStore.login(email.value, password.value)
-    router.push('/')
+    await userStore.register({
+      name: name.value.trim(),
+      email: email.value.trim(),
+      password: password.value,
+      passwordConfirmation: passwordConfirmation.value,
+    })
+    router.push({ name: 'onboarding' })
   } catch (error) {
-    if (error.response?.status === 401) {
-      errorMessage.value = 'Email atau password salah.'
+    const errors = error.response?.data?.errors
+    if (errors) {
+      errorMessage.value = Object.values(errors).flat()[0] || 'Registrasi gagal. Periksa kembali data kamu.'
     } else if (error.response?.data?.message) {
       errorMessage.value = error.response.data.message
     } else {
-      errorMessage.value = 'Gagal terhubung ke server. Untuk demo, gunakan kredensial dummy di bawah.'
+      errorMessage.value = 'Gagal terhubung ke server. Pastikan backend Laravel aktif.'
     }
   } finally {
     isLoading.value = false
   }
-}
-
-const useDummyCredential = () => {
-  email.value = DUMMY_CREDENTIALS.email
-  password.value = DUMMY_CREDENTIALS.password
 }
 </script>
 
@@ -78,50 +87,46 @@ const useDummyCredential = () => {
         <span></span>
       </div>
 
-      <h1>Masuk ke Leva</h1>
-      <p class="lead">Lanjutkan ke workspace akademikmu dan mulai pecah tugas jadi langkah kecil.</p>
+      <h1>Buat Akun Leva</h1>
+      <p class="lead">Daftar dulu, lalu Leva akan menyesuaikan workspace dengan profil akademikmu.</p>
 
       <div v-if="errorMessage" class="field-error-message" role="alert">
         <AppIcon name="warning" :size="12" color="#DC2626" />
         <span>{{ errorMessage }}</span>
       </div>
 
-      <form @submit.prevent="handleLogin">
+      <form @submit.prevent="handleRegister">
+        <label>
+          Nama lengkap
+          <input v-model="name" type="text" autocomplete="name" placeholder="Renisa Assyifa Putri" :disabled="isLoading" />
+        </label>
+
         <label>
           Email
-          <input v-model="email" type="email" autocomplete="email" placeholder="admin@example.com" :disabled="isLoading" />
+          <input v-model="email" type="email" autocomplete="email" placeholder="nama@student.com" :disabled="isLoading" />
         </label>
 
         <label>
           Password
-          <input v-model="password" type="password" autocomplete="current-password" placeholder="password" :disabled="isLoading" />
+          <input v-model="password" type="password" autocomplete="new-password" placeholder="Minimal 8 karakter" :disabled="isLoading" />
         </label>
 
-        <button class="btn-primary submit-button" type="submit" :disabled="isLoading">
+        <label>
+          Konfirmasi password
+          <input v-model="passwordConfirmation" type="password" autocomplete="new-password" placeholder="Ulangi password" :disabled="isLoading" />
+        </label>
+
+        <button class="btn-primary submit-button" type="submit" :disabled="!canSubmit">
           <span>
-            {{ isLoading ? 'Memproses...' : 'Masuk ke Dashboard' }}
+            {{ isLoading ? 'Mendaftarkan...' : 'Daftar dan Lanjut' }}
             <AppIcon v-if="!isLoading" name="arrow-right" :size="14" color="#fff" />
           </span>
         </button>
       </form>
 
-      <div class="divider">
-        <span></span>
-        <p>demo account</p>
-        <span></span>
-      </div>
-
-      <button class="dummy-card" type="button" @click="useDummyCredential">
-        <AppIcon name="user" :size="16" />
-        <span>
-          <strong>{{ DUMMY_CREDENTIALS.email }}</strong>
-          <small>Password: {{ DUMMY_CREDENTIALS.password }}</small>
-        </span>
-      </button>
-
       <p class="switch-auth">
-        Belum punya akun?
-        <RouterLink :to="{ name: 'register' }">Daftar di Leva</RouterLink>
+        Sudah punya akun?
+        <RouterLink :to="{ name: 'login' }">Masuk ke Leva</RouterLink>
       </p>
     </div>
   </div>
@@ -242,51 +247,6 @@ input:focus {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-}
-
-.divider {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin: 18px 0 12px;
-}
-
-.divider span {
-  flex: 1;
-  height: 1px;
-  background: var(--color-border);
-}
-
-.divider p {
-  margin: 0;
-  color: var(--color-text-secondary);
-  font-size: 12px;
-  font-weight: 600;
-}
-
-.dummy-card {
-  width: 100%;
-  border: 1px solid #D1D5DB;
-  border-radius: 10px;
-  background: #fff;
-  color: #374151;
-  padding: 12px 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  cursor: pointer;
-}
-
-.dummy-card span {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 2px;
-}
-
-.dummy-card small {
-  color: var(--color-text-secondary);
 }
 
 .switch-auth {

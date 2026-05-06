@@ -58,6 +58,7 @@ watch(
   (name) => {
     const titles = {
       login: 'Leva - Login',
+      register: 'Leva - Register',
       onboarding: 'Leva - Perkenalan',
       dashboard: 'Leva - Dashboard',
       chat: 'Leva - Chat & Task',

@@ -31,6 +31,21 @@ export const useUserStore = defineStore('user', {
         isProfileLoaded: false,
     }),
     actions: {
+        async register(payload) {
+            try {
+                await api.post('/register', {
+                    name: payload.name,
+                    email: payload.email,
+                    password: payload.password,
+                    password_confirmation: payload.passwordConfirmation,
+                });
+
+                return this.login(payload.email, payload.password);
+            } catch (error) {
+                console.error("Register failed", error);
+                throw error;
+            }
+        },
         async login(email, password) {
             if (isDummyLogin(email, password)) {
                 const dummyUser = getDummyUser()
